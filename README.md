@@ -101,6 +101,6 @@ The app and evaluation were exercised in the available Python 3.14.5 environment
 
 ## Technology and responsible use
 
-Python, Streamlit, scikit-learn, TF-IDF, Logistic Regression, Multinomial Naive Bayes, Linear SVM, pandas, NumPy, PyArrow, and joblib. The app adds rule-based URL/keyword indicators, kept distinct from the machine-learning score. Feature contributions show learned TF-IDF associations and provide context for the model score.
+Python, Streamlit, scikit-learn, TF-IDF, Logistic Regression, Multinomial Naive Bayes, Linear SVM, pandas, NumPy, PyArrow, Codex and joblib. The app adds rule-based URL/keyword indicators, kept distinct from the machine-learning score. Feature contributions show learned TF-IDF associations and provide context for the model score.
 
 Use the score to prioritize review, and verify sensitive requests through official channels before taking action. Do not use the score as the sole basis for accusing a sender or making a financial decision. Avoid entering private messages or sensitive data in public demos. This application provides message-awareness guidance and is not financial advice.
