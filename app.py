@@ -1,246 +1,131 @@
-
+from pathlib import Path
 import re
+
 import joblib
 import numpy as np
 import pandas as pd
 import streamlit as st
 
-# -----------------------------
-# PAGE CONFIGURATION
-# -----------------------------
 
-st.set_page_config(
-    page_title="Nepal ScamShield",
-    page_icon="🛡️",
-    layout="wide"
-)
+ROOT = Path(__file__).resolve().parent
+MODEL_PATH = ROOT / "model" / "nepal_scamshield_model.pkl"
 
-# -----------------------------
-# LOAD MODEL
-# -----------------------------
+st.set_page_config(page_title="Nepal ScamShield", page_icon="🛡️", layout="wide")
+
 
 @st.cache_resource
 def load_model():
-    return joblib.load("model/nepal_scamshield_model.pkl")
+    return joblib.load(MODEL_PATH)
+
 
 try:
     model = load_model()
-except Exception as error:
-    st.error("Could not load the trained model.")
-    st.code(str(error))
+except Exception as exc:
+    st.error("Could not load the trained model. Confirm the model file and compatible dependencies are installed.")
+    st.exception(exc)
     st.stop()
 
 vectoriser = model.named_steps["tfidf"]
 classifier = model.named_steps["classifier"]
-
-# -----------------------------
-# HELPER FUNCTIONS
-# -----------------------------
-
-def get_spam_score(message):
-    probabilities = model.predict_proba([message])[0]
-    spam_index = list(classifier.classes_).index("spam")
-    return float(probabilities[spam_index])
+SPAM_INDEX = list(classifier.classes_).index("spam")
 
 
-def explain_message(message):
-    vector = vectoriser.transform([message])
-    feature_names = vectoriser.get_feature_names_out()
+def spam_score(message: str) -> float:
+    return float(model.predict_proba([message])[0][SPAM_INDEX])
+
+
+def feature_contributions(message: str, limit: int = 5) -> list[dict]:
+    """Rank present TF-IDF features by their positive linear spam contribution."""
+    row = vectoriser.transform([message]).tocoo()
+    if not row.nnz:
+        return []
+    spam_direction = 1 if classifier.classes_[1] == "spam" else -1
     coefficients = classifier.coef_[0]
-
-    # Positive contributions indicate spam.
-    direction = (
-        1 if classifier.classes_[1] == "spam" else -1
-    )
-
-    contributions = vector.toarray()[0] * coefficients * direction
-
-    important = []
-
-    for index in np.argsort(contributions)[::-1]:
-        if contributions[index] <= 0:
-            break
-
-        important.append({
-            "Term": feature_names[index],
-            "Contribution": round(float(contributions[index]), 4)
-        })
-
-        if len(important) == 5:
-            break
-
-    return important
+    names = vectoriser.get_feature_names_out()
+    values = [(names[index], float(value * coefficients[index] * spam_direction))
+              for index, value in zip(row.col, row.data)]
+    values = sorted((item for item in values if item[1] > 0), key=lambda item: item[1], reverse=True)
+    return [{"Feature": term, "Contribution": round(value, 4)} for term, value in values[:limit]]
 
 
-def check_indicators(message):
-    indicators = []
-
-    if re.search(
-        r"https?://|www\.|bit\.ly|tinyurl",
-        message,
-        re.IGNORECASE
-    ):
-        indicators.append(
-            "Contains a web link. Check its destination carefully."
-        )
-
-    patterns = {
-        "Urgency": r"\burgent\b|\bimmediately\b|\bact now\b",
-        "Financial request": r"\bpay\b|\btransfer\b|\bpayment\b",
-        "Sensitive information": r"\botp\b|\bpin\b|\bpassword\b",
-        "Reward or prize": r"\bwon\b|\bprize\b|\breward\b|\bfree\b",
-        "Account verification": r"\bverify\b|\baccount suspended\b"
+def check_indicators(message: str) -> list[str]:
+    rules = {
+        "Suspicious URL": r"(?:https?://|www\.|bit\.ly|tinyurl|t\.co)\S*",
+        "Urgency-related language": r"\b(?:urgent|immediately|act now|right away|expire today|turuntai)\b",
+        "Financial request": r"\b(?:pay|payment|transfer|fee|deposit|send money|npr|rupees|paisa)\b",
+        "Password, PIN, or OTP request": r"\b(?:password|passcode|pin|otp|one.time.password)\b",
+        "Reward or prize language": r"\b(?:won|winner|prize|reward|free gift|cash reward)\b",
+        "Account verification language": r"\b(?:verify|verification|confirm your account|account suspended|update your details)\b",
     }
+    return [label for label, pattern in rules.items() if re.search(pattern, message, re.IGNORECASE)]
 
-    for name, pattern in patterns.items():
-        if re.search(pattern, message, re.IGNORECASE):
-            indicators.append(name)
-
-    return indicators
-
-
-# -----------------------------
-# HEADER
-# -----------------------------
 
 st.title("🛡️ Nepal ScamShield")
+st.write("An educational prototype for exploring suspicious SMS patterns in Nepal-focused scenarios.")
+st.caption("A model score is an estimate, not a verdict. Verify messages through official channels.")
 
-st.write(
-    "An AI-powered SMS classification prototype "
-    "designed to explore suspicious messages and "
-    "scam-awareness scenarios relevant to Nepal."
-)
+analyser, dashboard = st.tabs(["Message analyser", "Performance"])
 
-st.divider()
+with analyser:
+    st.subheader("Analyse a message")
+    message = st.text_area("Paste an SMS message", placeholder="Example: Your account needs verification...", height=140)
+    threshold = st.slider("Spam classification threshold", 0.10, 0.90, 0.50, 0.05,
+                          help="Lower values flag more messages; this can also increase false alarms.")
+    if st.button("Analyse message", type="primary"):
+        if not message.strip():
+            st.warning("Enter a message to analyse.")
+        else:
+            score = spam_score(message)
+            is_spam = score >= threshold
+            st.divider()
+            result_col, score_col = st.columns([2, 1])
+            with result_col:
+                if is_spam:
+                    st.error("Potential spam message")
+                else:
+                    st.success("Likely legitimate message")
+            with score_col:
+                st.metric("Model-estimated spam score", f"{score:.1%}")
+            st.progress(score)
 
-# -----------------------------
-# MAIN CLASSIFIER
-# -----------------------------
-
-st.subheader("Analyse a message")
-
-message = st.text_area(
-    "Paste an SMS message below",
-    placeholder="Example: Congratulations! You have won a prize...",
-    height=150
-)
-
-threshold = st.slider(
-    "Spam classification threshold",
-    min_value=0.10,
-    max_value=0.90,
-    value=0.50,
-    step=0.05,
-    help="A lower threshold flags more messages as spam, "
-         "but may also flag more legitimate messages."
-)
-
-if st.button("Analyse message", type="primary"):
-    if not message.strip():
-        st.warning("Please enter a message first.")
-
-    else:
-        score = get_spam_score(message)
-        prediction = "spam" if score >= threshold else "ham"
-
-        st.divider()
-        st.subheader("Analysis result")
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            if prediction == "spam":
-                st.error("Potential spam message")
+            st.subheader("Model feature contributions")
+            contributions = feature_contributions(message)
+            if contributions:
+                st.dataframe(pd.DataFrame(contributions), use_container_width=True, hide_index=True)
             else:
-                st.success("Likely legitimate message")
+                st.info("No recognised features with a positive spam contribution were found.")
+            st.caption("These are contributions from the model's input features, not guaranteed reasoning or proof of fraud.")
 
-        with col2:
-            st.metric(
-                "Model-estimated spam score",
-                f"{score * 100:.2f}%"
-            )
+            st.subheader("Rule-based suspicious-message indicators")
+            indicators = check_indicators(message)
+            if indicators:
+                for indicator in indicators:
+                    st.warning(indicator)
+            else:
+                st.info("None of the basic indicator rules matched.")
+            st.caption("These supplementary text rules are separate from the machine-learning prediction and can be wrong.")
 
-        st.progress(score)
+with dashboard:
+    st.subheader("Original held-out benchmark")
+    st.caption("Reported on the original held-out set of 1,115 messages at threshold 0.50.")
+    cols = st.columns(4)
+    for col, label, value in zip(cols, ["Accuracy", "Spam precision", "Spam recall", "Spam F1-score"],
+                                 ["97.04%", "100.00%", "77.85%", "87.55%"]):
+        col.metric(label, value)
+    st.write("Confusion matrix — rows are actual classes; columns are predicted classes.")
+    st.dataframe(pd.DataFrame([[966, 0], [33, 116]], index=["Actual ham", "Actual spam"],
+                              columns=["Predicted ham", "Predicted spam"]), use_container_width=True)
 
-        # Model explanation
-        st.subheader("What influenced the prediction?")
-
-        explanations = explain_message(message)
-
-        if explanations:
-            st.dataframe(
-                pd.DataFrame(explanations),
-                use_container_width=True,
-                hide_index=True
-            )
-            st.caption(
-                "These terms contributed positively to the model's "
-                "spam prediction. They are not proof of fraud."
-            )
-        else:
-            st.info(
-                "The model found no strong spam-associated terms "
-                "among the message's recognised features."
-            )
-
-        # Additional indicators
-        st.subheader("Suspicious-message indicators")
-
-        indicators = check_indicators(message)
-
-        if indicators:
-            for indicator in indicators:
-                st.warning(indicator)
-        else:
-            st.info("No indicators from our basic rule checks were found.")
-
-        st.caption(
-            "These additional indicators are simple rules, "
-            "not independent proof that a message is fraudulent."
-        )
-
-# -----------------------------
-# PERFORMANCE DASHBOARD
-# -----------------------------
+    st.divider()
+    st.subheader("Nepal synthetic evaluation")
+    st.caption("Separate evaluation on 16 manually written synthetic examples; this set is not representative of Nepalese scam prevalence.")
+    cols = st.columns(4)
+    for col, label, value in zip(cols, ["Accuracy", "Spam precision", "Spam recall", "Spam F1-score"],
+                                 ["62.50%", "100.00%", "25.00%", "40.00%"]):
+        col.metric(label, value)
+    st.dataframe(pd.DataFrame([[8, 0], [6, 2]], index=["Actual ham", "Actual spam"],
+                              columns=["Predicted ham", "Predicted spam"]), use_container_width=True)
+    st.info("Six of eight synthetic spam examples were missed. This small, manually authored test is useful for illustrating failure cases, not estimating real-world performance.")
 
 st.divider()
-st.subheader("Model performance")
-
-st.caption(
-    "Results from the held-out test set of 1,115 messages. "
-    "Classification threshold: 0.50."
-)
-
-c1, c2, c3, c4 = st.columns(4)
-
-c1.metric("Accuracy", "97.04%")
-c2.metric("Spam precision", "100.00%")
-c3.metric("Spam recall", "77.85%")
-c4.metric("Spam F1-score", "87.55%")
-
-st.write("### Confusion matrix")
-
-confusion = pd.DataFrame(
-    [[966, 0], [33, 116]],
-    index=["Actual Ham", "Actual Spam"],
-    columns=["Predicted Ham", "Predicted Spam"]
-)
-
-st.dataframe(
-    confusion,
-    use_container_width=True
-)
-
-st.info(
-    "The model missed 33 spam messages in this test set. "
-    "This is an important limitation, and the model should "
-    "not be treated as a guaranteed scam detector."
-)
-
-st.divider()
-
-st.caption(
-    "Nepal ScamShield is an experimental educational prototype. "
-    "It cannot guarantee that a message is safe or fraudulent. "
-    "Do not share private messages, passwords, PINs or OTPs."
-)
+st.caption("Nepal ScamShield is an educational prototype. This project is a prototype and is not financial advice. Do not share passwords, PINs, or OTPs.")
