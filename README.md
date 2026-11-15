@@ -99,15 +99,6 @@ On macOS/Linux, use `python3.12 -m venv .venv` and `source .venv/bin/activate` i
 
 The app and evaluation were exercised in the available Python 3.14.5 environment with Streamlit 1.67.0, scikit-learn 1.9.1, NumPy 2.5.4, pandas 3.1.1, PyArrow 26.0.1, and joblib 1.6.0. The exact NumPy 2.4.6 and pandas 2.2.3 pins have not been installed and validated together in a clean environment.
 
-## Deploy on Streamlit Community Cloud
-
-1. Push this repository to GitHub when ready to publish it.
-2. In Streamlit Community Cloud, create an app from the repository and select `app.py` as the main file.
-3. Choose Python 3.12, which matches the pinned dependency set and Cloud's current default.
-4. Deploy. The app loads `model/nepal_scamshield_unified.pkl` relative to `app.py`; keep that artifact and `requirements.txt` in the repository.
-
-No secrets or external services are required. For a judging demo, open **Message Analyser**, click a sample message, then select **Analyse message**. Visit **Model Performance** and **Nepal Evaluation** to see the two evaluation contexts separately. Do not submit private messages during a public demo.
-
 ## Technology and responsible use
 
 Python, Streamlit, scikit-learn, TF-IDF, Logistic Regression, Multinomial Naive Bayes, Linear SVM, pandas, NumPy, PyArrow, and joblib. The app adds rule-based URL/keyword indicators, kept distinct from the machine-learning score. Feature contributions show learned TF-IDF associations and provide context for the model score.
