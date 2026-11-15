@@ -1,0 +1,28 @@
+{
+  "n": 16,
+  "metrics": {
+    "accuracy": 1.0,
+    "spam_precision": 1.0,
+    "spam_recall": 1.0,
+    "spam_f1": 1.0,
+    "confusion_matrix_ham_spam": [
+      [
+        8,
+        0
+      ],
+      [
+        0,
+        8
+      ]
+    ],
+    "class_order": [
+      "ham",
+      "spam"
+    ]
+  },
+  "missed_spam_count": 0,
+  "spam_support": 8,
+  "missed_spam": [],
+  "training_or_model_selection_use": false,
+  "representative_of_nepal_prevalence": false
+}

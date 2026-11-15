@@ -1,0 +1,304 @@
+{
+  "random_seed": 42,
+  "normalization_for_duplicate_detection": "Unicode NFKC, casefold, collapse whitespace; punctuation retained",
+  "empty_rows_removed": 0,
+  "empty_rows_removed_by_dataset": {},
+  "input_rows_by_dataset": {
+    "Bengali SMS Smishing Dataset (Hugging Face)": 7005,
+    "UCI SMS Spam Collection": 5574
+  },
+  "input_original_category_counts": [
+    {
+      "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+      "original_category": "normal",
+      "count": 2488
+    },
+    {
+      "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+      "original_category": "promo",
+      "count": 1708
+    },
+    {
+      "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+      "original_category": "smish",
+      "count": 2809
+    },
+    {
+      "source_dataset": "UCI SMS Spam Collection",
+      "original_category": "ham",
+      "count": 4827
+    },
+    {
+      "source_dataset": "UCI SMS Spam Collection",
+      "original_category": "spam",
+      "count": 747
+    }
+  ],
+  "conflicting_duplicate_text_groups_removed": 0,
+  "conflicting_rows_removed_by_dataset": {},
+  "duplicate_rows_removed": 424,
+  "duplicate_text_groups": 299,
+  "duplicate_rows_removed_by_dataset": {
+    "Bengali SMS Smishing Dataset (Hugging Face)": 9,
+    "UCI SMS Spam Collection": 415
+  },
+  "duplicate_rows_removed_by_source_split": [
+    {
+      "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+      "source_split": "train",
+      "count": 9
+    },
+    {
+      "source_dataset": "UCI SMS Spam Collection",
+      "source_split": "unsplit",
+      "count": 415
+    }
+  ],
+  "cross_split_exact_normalized_text_overlaps": {
+    "train_validation": 0,
+    "train_test": 0,
+    "validation_test": 0
+  },
+  "source_file_sha256": {
+    "bengali_test.parquet": "2719d61aaf82b4b38e256e7e0d5ecee4a19588a7f522b863c713a435d0dffa31",
+    "bengali_train.parquet": "9fb92ea7e185297f4dd66442a7ed5f11ffc82d501c1ca2ea38385f430b9fe18e",
+    "bengali_validation.parquet": "a6a652087bbc328618cc39720a3ec66be53e106d9184dcf83791bc4da705a1fc",
+    "README.md": "c2694e07585821ac7df99b816e9f442809514bb21d2da09858c1a2616bc091b9",
+    "uci_sms_spam_collection.zip": "1587ea43e58e82b14ff1f5425c88e17f8496bfcdb67a583dbff9eefaf9963ce3"
+  },
+  "source_split_counts": {
+    "train": 8505,
+    "validation": 1217,
+    "test": 2433
+  },
+  "label_counts": {
+    "train": {
+      "ham": 6092,
+      "spam": 2413
+    },
+    "validation": {
+      "ham": 871,
+      "spam": 346
+    },
+    "test": {
+      "ham": 1744,
+      "spam": 689
+    }
+  },
+  "dataset_language_counts": {
+    "train": [
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Banglish",
+        "label": "ham",
+        "count": 765
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Banglish",
+        "label": "spam",
+        "count": 495
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Bengali",
+        "label": "ham",
+        "count": 754
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Bengali",
+        "label": "spam",
+        "count": 493
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "CodeMix",
+        "label": "ham",
+        "count": 693
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "CodeMix",
+        "label": "spam",
+        "count": 481
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "English",
+        "label": "ham",
+        "count": 719
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "English",
+        "label": "spam",
+        "count": 494
+      },
+      {
+        "source_dataset": "UCI SMS Spam Collection",
+        "language": "English",
+        "label": "ham",
+        "count": 3161
+      },
+      {
+        "source_dataset": "UCI SMS Spam Collection",
+        "language": "English",
+        "label": "spam",
+        "count": 450
+      }
+    ],
+    "validation": [
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Banglish",
+        "label": "ham",
+        "count": 109
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Banglish",
+        "label": "spam",
+        "count": 71
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Bengali",
+        "label": "ham",
+        "count": 108
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Bengali",
+        "label": "spam",
+        "count": 71
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "CodeMix",
+        "label": "ham",
+        "count": 99
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "CodeMix",
+        "label": "spam",
+        "count": 69
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "English",
+        "label": "ham",
+        "count": 103
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "English",
+        "label": "spam",
+        "count": 71
+      },
+      {
+        "source_dataset": "UCI SMS Spam Collection",
+        "language": "English",
+        "label": "ham",
+        "count": 452
+      },
+      {
+        "source_dataset": "UCI SMS Spam Collection",
+        "language": "English",
+        "label": "spam",
+        "count": 64
+      }
+    ],
+    "test": [
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Banglish",
+        "label": "ham",
+        "count": 219
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Banglish",
+        "label": "spam",
+        "count": 141
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Bengali",
+        "label": "ham",
+        "count": 217
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "Bengali",
+        "label": "spam",
+        "count": 141
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "CodeMix",
+        "label": "ham",
+        "count": 198
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "CodeMix",
+        "label": "spam",
+        "count": 138
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "English",
+        "label": "ham",
+        "count": 206
+      },
+      {
+        "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+        "language": "English",
+        "label": "spam",
+        "count": 141
+      },
+      {
+        "source_dataset": "UCI SMS Spam Collection",
+        "language": "English",
+        "label": "ham",
+        "count": 904
+      },
+      {
+        "source_dataset": "UCI SMS Spam Collection",
+        "language": "English",
+        "label": "spam",
+        "count": 128
+      }
+    ]
+  },
+  "source_original_category_counts": [
+    {
+      "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+      "original_category": "normal",
+      "count": 2485
+    },
+    {
+      "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+      "original_category": "promo",
+      "count": 1705
+    },
+    {
+      "source_dataset": "Bengali SMS Smishing Dataset (Hugging Face)",
+      "original_category": "smish",
+      "count": 2806
+    },
+    {
+      "source_dataset": "UCI SMS Spam Collection",
+      "original_category": "ham",
+      "count": 4517
+    },
+    {
+      "source_dataset": "UCI SMS Spam Collection",
+      "original_category": "spam",
+      "count": 642
+    }
+  ],
+  "nepal_synthetic_test_rows_excluded": 16
+}

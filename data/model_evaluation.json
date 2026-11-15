@@ -1,0 +1,329 @@
+{
+  "protocol": {
+    "random_seed": 42,
+    "selection_split": "validation",
+    "selection_rule": "highest spam recall at probability threshold 0.50; ties broken by spam precision then spam F1",
+    "final_test_used_for_training_or_tuning": false,
+    "test_split_includes": "official Bengali source test rows plus seeded stratified UCI holdout",
+    "tfidf": {
+      "ngram_range": [
+        1,
+        2
+      ],
+      "min_df": 2,
+      "sublinear_tf": true,
+      "lowercase": true
+    },
+    "linear_svm_calibration": "sigmoid calibration with 3-fold CV inside training data",
+    "selected_model": "Linear SVM (sigmoid-calibrated)",
+    "saved_model": "model\\nepal_scamshield_unified.pkl"
+  },
+  "comparison_validation": {
+    "Logistic Regression": {
+      "n": 1217,
+      "accuracy": 0.971240755957272,
+      "spam_precision": 0.9755351681957186,
+      "spam_recall": 0.9219653179190751,
+      "spam_f1": 0.9479940564635958,
+      "false_positives": 8,
+      "false_negatives": 27,
+      "confusion_matrix_ham_spam": [
+        [
+          863,
+          8
+        ],
+        [
+          27,
+          319
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "Multinomial Naive Bayes": {
+      "n": 1217,
+      "accuracy": 0.9663105998356615,
+      "spam_precision": 0.9692307692307692,
+      "spam_recall": 0.9104046242774566,
+      "spam_f1": 0.9388971684053651,
+      "false_positives": 10,
+      "false_negatives": 31,
+      "confusion_matrix_ham_spam": [
+        [
+          861,
+          10
+        ],
+        [
+          31,
+          315
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "Linear SVM (sigmoid-calibrated)": {
+      "n": 1217,
+      "accuracy": 0.9835661462612982,
+      "spam_precision": 0.9578651685393258,
+      "spam_recall": 0.9855491329479769,
+      "spam_f1": 0.9715099715099715,
+      "false_positives": 15,
+      "false_negatives": 5,
+      "confusion_matrix_ham_spam": [
+        [
+          856,
+          15
+        ],
+        [
+          5,
+          341
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    }
+  },
+  "comparison_final_test": {
+    "Logistic Regression": {
+      "n": 2433,
+      "accuracy": 0.9712289354706124,
+      "spam_precision": 0.9754224270353302,
+      "spam_recall": 0.9216255442670537,
+      "spam_f1": 0.9477611940298507,
+      "false_positives": 16,
+      "false_negatives": 54,
+      "confusion_matrix_ham_spam": [
+        [
+          1728,
+          16
+        ],
+        [
+          54,
+          635
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "Multinomial Naive Bayes": {
+      "n": 2433,
+      "accuracy": 0.9654747225647349,
+      "spam_precision": 0.9604261796042618,
+      "spam_recall": 0.9158200290275762,
+      "spam_f1": 0.937592867756315,
+      "false_positives": 26,
+      "false_negatives": 58,
+      "confusion_matrix_ham_spam": [
+        [
+          1718,
+          26
+        ],
+        [
+          58,
+          631
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "Linear SVM (sigmoid-calibrated)": {
+      "n": 2433,
+      "accuracy": 0.9868475133579943,
+      "spam_precision": 0.9726618705035971,
+      "spam_recall": 0.9811320754716981,
+      "spam_f1": 0.976878612716763,
+      "false_positives": 19,
+      "false_negatives": 13,
+      "confusion_matrix_ham_spam": [
+        [
+          1725,
+          19
+        ],
+        [
+          13,
+          676
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    }
+  },
+  "selected_model_final_test_by_source": {
+    "Bengali SMS Smishing Dataset (Hugging Face)": {
+      "n": 1401,
+      "accuracy": 0.9842969307637401,
+      "spam_precision": 0.9686956521739131,
+      "spam_recall": 0.9928698752228164,
+      "spam_f1": 0.9806338028169014,
+      "false_positives": 18,
+      "false_negatives": 4,
+      "confusion_matrix_ham_spam": [
+        [
+          822,
+          18
+        ],
+        [
+          4,
+          557
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "UCI SMS Spam Collection": {
+      "n": 1032,
+      "accuracy": 0.9903100775193798,
+      "spam_precision": 0.9916666666666667,
+      "spam_recall": 0.9296875,
+      "spam_f1": 0.9596774193548387,
+      "false_positives": 1,
+      "false_negatives": 9,
+      "confusion_matrix_ham_spam": [
+        [
+          903,
+          1
+        ],
+        [
+          9,
+          119
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    }
+  },
+  "selected_model_final_test_by_source_and_language": {
+    "Bengali SMS Smishing Dataset (Hugging Face) | Banglish": {
+      "n": 360,
+      "accuracy": 0.9833333333333333,
+      "spam_precision": 0.9655172413793104,
+      "spam_recall": 0.9929078014184397,
+      "spam_f1": 0.9790209790209791,
+      "false_positives": 5,
+      "false_negatives": 1,
+      "confusion_matrix_ham_spam": [
+        [
+          214,
+          5
+        ],
+        [
+          1,
+          140
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "Bengali SMS Smishing Dataset (Hugging Face) | Bengali": {
+      "n": 358,
+      "accuracy": 0.9804469273743017,
+      "spam_precision": 0.958904109589041,
+      "spam_recall": 0.9929078014184397,
+      "spam_f1": 0.975609756097561,
+      "false_positives": 6,
+      "false_negatives": 1,
+      "confusion_matrix_ham_spam": [
+        [
+          211,
+          6
+        ],
+        [
+          1,
+          140
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "Bengali SMS Smishing Dataset (Hugging Face) | CodeMix": {
+      "n": 336,
+      "accuracy": 0.9791666666666666,
+      "spam_precision": 0.958041958041958,
+      "spam_recall": 0.9927536231884058,
+      "spam_f1": 0.9750889679715302,
+      "false_positives": 6,
+      "false_negatives": 1,
+      "confusion_matrix_ham_spam": [
+        [
+          192,
+          6
+        ],
+        [
+          1,
+          137
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "Bengali SMS Smishing Dataset (Hugging Face) | English": {
+      "n": 347,
+      "accuracy": 0.9942363112391931,
+      "spam_precision": 0.9929078014184397,
+      "spam_recall": 0.9929078014184397,
+      "spam_f1": 0.9929078014184397,
+      "false_positives": 1,
+      "false_negatives": 1,
+      "confusion_matrix_ham_spam": [
+        [
+          205,
+          1
+        ],
+        [
+          1,
+          140
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    },
+    "UCI SMS Spam Collection | English": {
+      "n": 1032,
+      "accuracy": 0.9903100775193798,
+      "spam_precision": 0.9916666666666667,
+      "spam_recall": 0.9296875,
+      "spam_f1": 0.9596774193548387,
+      "false_positives": 1,
+      "false_negatives": 9,
+      "confusion_matrix_ham_spam": [
+        [
+          903,
+          1
+        ],
+        [
+          9,
+          119
+        ]
+      ],
+      "class_order": [
+        "ham",
+        "spam"
+      ]
+    }
+  },
+  "nepal_synthetic_set_used_for_training_or_tuning": false
+}

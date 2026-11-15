@@ -1,0 +1,8 @@
+# Source data and attribution
+
+- `uci_sms_spam_collection.zip`: Almeida, T. A. and Hidalgo, J. M. G. (2011), *SMS Spam Collection*, UCI Machine Learning Repository, DOI [10.24432/C5CC84](https://doi.org/10.24432/C5CC84). UCI lists the dataset under CC BY 4.0. Preserve attribution when reusing it.
+- `bengali_train.parquet`, `bengali_validation.parquet`, `bengali_test.parquet`: [Bengali SMS Smishing Dataset](https://huggingface.co/datasets/shariul-islam/bengali-sms-smishing-dataset), dataset card declares MIT. The card describes Bengali, English, Banglish, and CodeMix varieties and labels `smish`, `promo`, and `normal`. The related research describes LLM translation and synthetic generation; these are not Nepali data.
+
+`prepare_dataset.py` creates the unified split files from these source artifacts and records SHA-256 hashes, row counts, label/language counts, and duplicate checks in `data/dataset_audit.json`. The separate Nepal-focused synthetic examples and the unverified multilingual exploratory CSV are not source data and are never included in the unified training corpus.
+
+The proposed Mendeley *Financial scams detection dataset* (Ahmed & Islam, 2025, version 2, DOI [10.17632/znsk27yk3h.2](https://doi.org/10.17632/znsk27yk3h.2)) is declared CC BY 4.0. Its public description reports manually labeled `scam`/`ham` messages in English and Bangla, drawn across SMS, chat, and email. The files could not be reliably retrieved in this environment (public API returned 401 and record download returned 403), so no copy or examples from it are included. Its mixed channel types also need review before treating it as SMS-only training data.

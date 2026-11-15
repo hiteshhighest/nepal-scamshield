@@ -1,99 +1,115 @@
 ﻿# Nepal ScamShield
 
-An AI-powered SMS spam classification and scam-awareness prototype focused on Nepal-related message scenarios.
+An AI-assisted SMS threat-awareness application for reviewing suspicious messages. The current classifier is trained on UCI English SMS spam and a separate Bengali-focused multilingual smishing dataset. Nepal-focused synthetic examples are evaluated separately; benchmark metrics apply to the documented corpus splits.
 
-## Problem
-SMS messages can pressure recipients into clicking links, sharing credentials, or sending money. A text classifier can help people inspect suspicious wording, but cannot establish whether a message or sender is genuine.
+## Project overview
 
-## Proposed solution
-ScamShield combines a saved machine-learning text classifier, an adjustable spam-score threshold, transparent model-feature contributions, and separate rule-based indicators. It also presents the project's two evaluation sets separately so their results are not conflated.
+ScamShield combines a saved message classifier, an adjustable spam threshold, and independent message-pattern indicators in one SMS-awareness application. The unified corpus preserves each source's original category while mapping examples to `ham` or `spam` for evaluation. Nepal-focused synthetic examples are reported separately and were not used to fit or select the model.
 
-## Why this matters
-Users benefit from a pause-and-check aid when a message requests urgent action, money, or sensitive information. This prototype is intended for awareness and experimentation, not as a security service or substitute for contacting an institution through a known official channel.
+## Sources, licences, and limitations
 
-## How the model works
-The application loads `model/nepal_scamshield_model.pkl`, a scikit-learn pipeline with TF-IDF features (unigrams and bigrams) and logistic regression. The app displays the model's estimated spam probability and applies the user-selected threshold. The explanation ranks present TF-IDF features by their positive linear contribution to the spam class. This is a limited feature attribution, not guaranteed reasoning or proof of fraud.
+### UCI SMS Spam Collection
 
-The model was preserved and was not retrained for this submission. The repository has no original training notebook or training script, so the exact split, all preprocessing decisions, and a reproducible training run could not be independently checked. The reported original benchmark is retained as supplied project results.
+Almeida and Hidalgo (2011), [UCI Machine Learning Repository: SMS Spam Collection](https://archive.ics.uci.edu/dataset/228/sms+spam+collection), DOI [10.24432/C5CC84](https://doi.org/10.24432/C5CC84), 5,574 English SMS rows with `ham` and `spam` labels. UCI identifies the licence as CC BY 4.0 and credits several underlying corpora and sources. The source contains repeated texts; duplicates were removed before splitting. Attribution is included in [data/source/README.md](data/source/README.md).
 
-## Dataset source and credits
-The original classifier is credited to the **SMS Spam Collection** dataset from the [University of California Irvine Machine Learning Repository](https://archive.ics.uci.edu/dataset/228/sms+spam+collection). Please retain this attribution when presenting the model. The project also uses a separate 16-row, manually written, synthetic Nepal-focused test set at `data/nepal_synthetic_test.csv`. These examples are invented for testing and do not represent actual reported incidents or Nepalese scam prevalence.
+### Bengali SMS Smishing Dataset
 
-Libraries: Streamlit, scikit-learn, NumPy, pandas, and joblib. The synthetic test data was authored for this project; no external source is claimed for those messages.
+[Hugging Face dataset card](https://huggingface.co/datasets/shariul-islam/bengali-sms-smishing-dataset), 7,005 rows in its published train/validation/test partitions. The card declares MIT and lists Bengali, English, Banglish, and CodeMix varieties, with original categories `smish`, `promo`, and `normal`. `smish` maps to `spam`; `promo` and `normal` map to `ham`, because the card describes promotion as legitimate marketing. Original labels and language variety are retained in the unified CSVs. The related [research description](https://researchportal.murdoch.edu.au/esploro/outputs/graduate/A-Multilingual-Fine-Tuned-LLM-Framework-for/991005909771807891) reports LLM translation and synthetic generation in dataset construction. The repository-level MIT declaration is recorded, but the underlying source of every row is not independently auditable. Results measure this published corpus and its generation and translation patterns. Bengali/Bangla and Banglish are not Nepali.
 
-## Training methodology and baseline comparison
-The saved pipeline indicates TF-IDF text features with 1–2 word n-grams, English stop-word removal, sublinear term frequency, and logistic regression. The original training notebook was not present, so training and validation details beyond the artifact and supplied benchmark cannot be reproduced here. No independently measured alternative baseline was present in the repository; therefore no baseline comparison is claimed.
+### Financial scams detection dataset
 
-## Original held-out benchmark
-Reported results on 1,115 messages, at the original threshold of 0.50:
+Ahmed and Islam (2025), [Mendeley Data, version 2](https://data.mendeley.com/datasets/znsk27yk3h/2), DOI [10.17632/znsk27yk3h.2](https://doi.org/10.17632/znsk27yk3h.2), declares CC BY 4.0. Its public description says messages are manually labeled `scam`/`ham`, English and Bangla, and sourced across SMS, chat, and email. The file could not be reliably retrieved here (public API returned 401; record download returned 403), so it is not included and no results are claimed for it. Its channel mix also needs review before treating it as SMS-only.
 
-| Metric | Result |
-| --- | ---: |
-| Accuracy | 97.04% |
-| Spam precision | 100.00% |
-| Spam recall | 77.85% |
-| Spam F1-score | 87.55% |
+### Synthetic and exploratory data
 
-Confusion matrix, rows actual ham/spam and columns predicted ham/spam:
+`data/nepal_synthetic_test.csv` contains 16 manually written Nepal-focused examples and remains a separate exploratory evaluation only. It is excluded from training and selection. `data/multilingual_synthetic_exploratory.csv` is retained as an exploratory file but excluded from training and evaluation because its provenance is unverified and its contents do not establish Nepal relevance. Neither synthetic file represents scam prevalence or reported incidents.
 
-```text
-[[966,   0],
- [ 33, 116]]
-```
+## Dataset preparation and quality checks
 
-These are the project's original held-out results, not results from the Nepal synthetic set.
+Run `python prepare_dataset.py` after installing dependencies. The script reads the downloaded source artifacts in `data/source/`, removes empty messages and conflicting-label duplicate groups, then de-duplicates on Unicode NFKC + casefolded + whitespace-collapsed text (punctuation retained). It preserves source dataset, original category, language variety, source partition, and source row ID.
 
-## Nepal synthetic evaluation
-Running `python evaluate_nepal.py` evaluates only the separate 16-message synthetic test file:
+The source artifacts contain 5,574 UCI rows (`ham` 4,827; `spam` 747) and 7,005 Bengali-dataset rows (`normal` 2,488; `promo` 1,708; `smish` 2,809). The recorded preparation run found 0 empty messages, 0 conflicting-label duplicate groups, and removed 424 exact duplicate rows from 12,579 source rows (415 UCI rows and 9 Bengali-dataset rows). It found zero exact normalized-text overlaps between each pair of effective splits. This exact-text check does not detect near-duplicate templates or campaign-level overlap, so it cannot rule out every form of leakage. Detailed counts and source-file SHA-256 hashes are in `data/dataset_audit.json`.
 
-| Metric | Result |
-| --- | ---: |
-| Accuracy | 62.50% |
-| Spam precision | 100.00% |
-| Spam recall | 25.00% |
-| Spam F1-score | 40.00% |
+The Bengali dataset's published test partition remains held out. UCI has no official split here, so its de-duplicated rows were split with seed 42 into 70% train, 10% validation, and 20% test. Final unified counts:
 
-Confusion matrix, rows actual ham/spam and columns predicted ham/spam:
+| Split | Rows | Ham | Spam |
+| --- | ---: | ---: | ---: |
+| Train | 8,505 | 6,092 | 2,413 |
+| Validation | 1,217 | 871 | 346 |
+| Final test | 2,433 | 1,744 | 689 |
 
-```text
-[[8, 0],
- [6, 2]]
-```
+The final test consists of the Bengali publisher's held-out test partition and the seeded UCI holdout. Duplicate text is assigned to at most one effective split. Nepal synthetic examples are not used for any fit or tuning.
 
-The examples cover wallet and bank verification, parcel delivery, scholarship fees, rewards, payment requests, legitimate education and conversations, and English/Romanised Nepali. Six of eight synthetic spam examples were missed; the false negatives include account verification, wallet, fee, and parcel wording. The set is tiny and manually authored, so these outcomes are diagnostic examples only, not an estimate of performance on real Nepalese messages.
+## Model and evaluation protocol
 
-## Limitations and failure cases
+`train_models.py` fits TF-IDF word unigrams and bigrams (`min_df=2`, sublinear TF) with Logistic Regression, Multinomial Naive Bayes, and sigmoid-calibrated Linear SVM. The fixed probability threshold is 0.50. Model selection uses validation spam recall, with ties broken by spam precision then F1. All three fixed candidates are then reported on the final test for comparison; those test results do not select or tune the model. The chosen model is refit on train plus validation and saved to `model/nepal_scamshield_unified.pkl`.
 
-- The model can miss scam-like messages that use vocabulary or phrasing unlike its training data; the synthetic test demonstrates this.
-- A high spam score does not prove fraud, and a low score does not prove safety.
-- The synthetic test has only 16 examples and is not representative of prevalence, language diversity, or real-world message distribution.
-- Rule checks use simple keyword and URL patterns. They may miss variants and may flag benign messages.
-- Feature contribution displays model inputs that push toward the spam class; they do not expose a complete causal explanation.
-- No real-world deployment, user study, or performance guarantee is claimed.
+Metrics are accuracy and spam-class precision, recall, and F1. Confusion matrix order is rows actual `[ham, spam]`, columns predicted `[ham, spam]`. False positives are benign messages flagged as spam; false negatives are spam messages missed.
+
+### Validation comparison (selection split, n=1,217)
+
+| Model | Accuracy | Spam precision | Spam recall | Spam F1 | Confusion matrix |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Logistic Regression | 97.12% | 97.55% | 92.20% | 94.80% | `[[863, 8], [27, 319]]` |
+| Multinomial Naive Bayes | 96.63% | 96.92% | 91.04% | 93.89% | `[[861, 10], [31, 315]]` |
+| Linear SVM (sigmoid-calibrated) | 98.36% | 95.79% | 98.55% | 97.15% | `[[856, 15], [5, 341]]` |
+
+Linear SVM was selected on validation because it had the highest spam recall at the fixed threshold.
+
+### Final test comparison (n=2,433)
+
+| Model | Accuracy | Spam precision | Spam recall | Spam F1 | FP | FN | Confusion matrix |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| Logistic Regression | 97.12% | 97.54% | 92.16% | 94.78% | 16 | 54 | `[[1728, 16], [54, 635]]` |
+| Multinomial Naive Bayes | 96.55% | 96.04% | 91.58% | 93.76% | 26 | 58 | `[[1718, 26], [58, 631]]` |
+| Linear SVM (selected) | 98.68% | 97.27% | 98.11% | 97.69% | 19 | 13 | `[[1725, 19], [13, 676]]` |
+
+The selected model's source/language-specific metrics and confusion matrices are in `data/model_evaluation.json` and shown in the app.
+
+| Final test source / language | n | Accuracy | Spam precision | Spam recall | Spam F1 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| UCI — English | 1,032 | 99.03% | 99.17% | 92.97% | 95.97% |
+| Bengali dataset — Bengali | 358 | 98.04% | 95.89% | 99.29% | 97.56% |
+| Bengali dataset — Banglish | 360 | 98.33% | 96.55% | 99.29% | 97.90% |
+| Bengali dataset — CodeMix | 336 | 97.92% | 95.80% | 99.28% | 97.51% |
+| Bengali dataset — English | 347 | 99.42% | 99.29% | 99.29% | 99.29% |
+
+These are separate corpus/language slices and do not establish Nepali performance.
+
+These scores describe the named, deduplicated corpora and their partitions. UCI's `spam` label covers general SMS spam, while Bengali `smish` labels smishing and `promo` labels legitimate marketing. Original categories remain in the data, and the combined benchmark is a mixed-source binary task. The benchmark measures these corpus splits; it does not provide a Nepal-specific performance estimate.
+
+### Nepal synthetic exploratory evaluation
+
+`python evaluate_nepal.py` scores 16 hand-written Nepal-focused examples with the saved unified model. Current result: accuracy 100%, spam precision 100%, spam recall 100%, F1 100%; confusion matrix `[[8, 0], [0, 8]]`. This result summarizes those authored examples only. The set is separate from the benchmark and is never used to train, choose, or tune the model.
 
 ## Run locally
 
-Requires a Python environment compatible with the pinned dependencies. From this directory:
+Use Python 3.12 or 3.13 with the pinned dependencies. From the repository root:
 
-```bash
-python -m venv .venv
+```powershell
 # Windows PowerShell
+py -3.12 -m venv .venv
 .venv\Scripts\Activate.ps1
-# macOS/Linux: source .venv/bin/activate
 python -m pip install -r requirements.txt
+python evaluate_nepal.py
 streamlit run app.py
 ```
 
-Run the synthetic evaluation separately with:
+On macOS/Linux, use `python3.12 -m venv .venv` and `source .venv/bin/activate` in place of the first two commands. Evaluation loads the checked-in model and reports the separate Nepal synthetic set; starting the app requires no training step. `prepare_dataset.py` and `train_models.py` are reproducibility tools. Running `train_models.py` refits the three candidates and overwrites the saved unified model and benchmark report, so it is not part of the normal launch flow.
 
-```bash
-python evaluate_nepal.py
-```
+The app and evaluation were exercised in the available Python 3.14.5 environment with Streamlit 1.67.0, scikit-learn 1.9.1, NumPy 2.5.4, pandas 3.1.1, PyArrow 26.0.1, and joblib 1.6.0. The exact NumPy 2.4.6 and pandas 2.2.3 pins have not been installed and validated together in a clean environment.
 
-The Streamlit Community Cloud entry point is `app.py`. Keep `model/nepal_scamshield_model.pkl` and `data/nepal_synthetic_test.csv` in their repository paths. No credentials or local absolute paths are required.
+## Deploy on Streamlit Community Cloud
 
-## Technology stack
-Python, Streamlit, scikit-learn, TF-IDF, logistic regression, NumPy, pandas, and joblib.
+1. Push this repository to GitHub when ready to publish it.
+2. In Streamlit Community Cloud, create an app from the repository and select `app.py` as the main file.
+3. Choose Python 3.12, which matches the pinned dependency set and Cloud's current default.
+4. Deploy. The app loads `model/nepal_scamshield_unified.pkl` relative to `app.py`; keep that artifact and `requirements.txt` in the repository.
 
-## Ethical considerations
-Use the output as a prompt to verify a message independently, not to accuse a sender or make an automated financial decision. Avoid entering private messages or sensitive data in a public demo. The model and rules may be wrong. This project is a prototype and is not financial advice.
+No secrets or external services are required. For a judging demo, open **Message Analyser**, click a sample message, then select **Analyse message**. Visit **Model Performance** and **Nepal Evaluation** to see the two evaluation contexts separately. Do not submit private messages during a public demo.
+
+## Technology and responsible use
+
+Python, Streamlit, scikit-learn, TF-IDF, Logistic Regression, Multinomial Naive Bayes, Linear SVM, pandas, NumPy, PyArrow, and joblib. The app adds rule-based URL/keyword indicators, kept distinct from the machine-learning score. Feature contributions show learned TF-IDF associations and provide context for the model score.
+
+Use the score to prioritize review, and verify sensitive requests through official channels before taking action. Do not use the score as the sole basis for accusing a sender or making a financial decision. Avoid entering private messages or sensitive data in public demos. This application provides message-awareness guidance and is not financial advice.
